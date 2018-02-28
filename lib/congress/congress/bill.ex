@@ -33,7 +33,7 @@ defmodule Congress.Bill do
   end
 
   def pick_random_bill_except(old_slug) do
-    new_slug = get_bill_slug_by_id(:rand.uniform(get_bill_count())) # random id
+    new_slug = get_bill_slug_by_id(Enum.random(1..get_bill_count()))
 
     if old_slug == new_slug do
       pick_random_bill_except(old_slug)
