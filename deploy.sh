@@ -23,4 +23,4 @@ cd ../release_congress
 tar xzvf congress.tar.gz
 
 ./bin/congress stop || true
-PORT=???? ./bin/congress start
+PORT=8002 ./bin/congress start
