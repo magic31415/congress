@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :congress, Congress.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "congress",
+  password: "Dae3bohsha",
   database: "congress_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
