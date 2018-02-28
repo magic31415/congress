@@ -1,0 +1,35 @@
+@import "bootstrap";
+
+.background {
+	background-color: #e0e0e0;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+.float-left {
+	float: left;
+}
+
+.float-right {
+	float: right;
+}
+
+.center-button {
+	display: block;
+	margin: 0 auto;
+}
+
+.init-hidden {
+	display: none;
+}
+
+.text-independent {
+	color: #CEAD00;
+}
+
+#submit-address-btn {
+	padding-top: 0.3rem;
+	padding-bottom: 0.3rem;
+}

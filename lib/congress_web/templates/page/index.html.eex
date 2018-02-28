@@ -1,0 +1,94 @@
+<div class="text-center p-4 bg-primary rounded mt-1 mb-1">
+  <h1>What happened under Trump?</h1>
+  <h6 id="total-bill-count"></h6>
+</div>
+
+<div class="border border-primary border-5 rounded p-2" id="whole-box">
+
+  <div class="container">
+    <div class="row text-danger">
+      <h5 class="col" id="bill-number"></h5>
+      <div class="col"></div>
+      <h5 class="col text-right" id="enacted-date"></h5>
+    </div>
+  </div>
+
+  <div class="pl-3 pb-2 text-center">
+    <h2 class="text-dark mb-3" id="title"></h2>
+
+    <div class="init-hidden mt-3" id="more-info-box">
+      <div class="container">
+        <div class="row">
+          <div class="col"></div>
+          <h5 class="col"><a target="_blank" id="text-link">View Full Text</a></h5>
+          <div class="col"></div>
+        </div>
+        <div class="row text-success">
+          <div class="col" id="house">
+            <h6 class="inline-block">Passed in House</h6>
+            <h6 class="inline-block" id="house-vote"></h6>
+          </div>
+          <div class="col" id="senate">
+            <h6 class="inline-block">Passed in House</h6>
+            <h6 class="inline-block" id="senate-vote"></h6>
+          </div>
+          <div class="col">
+            <h6 id="president"></h6>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col" id="my-reps">
+            <h6 class="inline-block" id="house-rep"></h6>
+            <h6 class="inline-block" id="house-rep-vote"></h6>
+          </div>
+          <div class="col">
+            <div>
+              <h6 class="inline-block" id="senator2"></h6>
+              <h6 class="inline-block" id="senator2-vote"></h6>
+            </div>
+            <div>
+              <h6 class="inline-block" id="senator1"></h6>
+              <h6 class="inline-block" id="senator1-vote"></h6>
+            </div>
+          </div>
+          <div class="col">
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-link" id="see-how-voted-btn">
+        See how my representatives voted on this bill
+      </button>
+      <div class="init-hidden mt-1 mb-1" id="enter-info">
+        Enter your address and zip code to see how your representatives voted
+      </div>
+      
+        <div class="container init-hidden" id="reps-votes">
+          <div class="row">
+            <div class="col-2"></div>
+            <div class="col-4 px-0">
+              <%= label :user, :address, "Street Address:" %>
+              <%= text_input :user, :address, placeholder: "938 Quincy Street" %>
+            </div>
+            <div class="col-2 px-0">
+              <%= label :user, :zip, "Zip Code:" %>
+              <%= text_input :user, :zip, placeholder: "19403", size: "5em" %>
+            </div>
+            <div class="col-1 px-0">
+              <button type="button"
+                      class="btn"
+                      disabled="disabled" 
+                      id="submit-address-btn">Submit</button>
+            </div>
+            <div class="col-2"></div>
+          </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-link" id="toggle-more-info">Show Additional Info</button>
+  </div>
+</div>
+
+<button type="button"
+        class="btn btn-danger btn-lg center-button mt-5"
+        id="what-else-button">What Else Happened?</button>
