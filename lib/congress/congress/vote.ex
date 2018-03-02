@@ -1,57 +1,62 @@
 defmodule Congress.Vote do
   alias Congress.Congress
 
-  def get_session(date) do
-  	date
-  	|> String.split("-")
-  	|> Enum.at(0)
-  	|> Integer.parse
-  	|> elem(0)
-  	|> rem(2)
-  	# odd years (rem = 1) are session 1, even years (rem = 0) are session 2
-  	|> Kernel.*(-1)
-  	|> Kernel.+(2)
-  end
-
-  def get_roll_call_info(chamber, votes) do
-  		votes
-	  	|> Enum.find(%{"roll_call": nil, "date": nil},
-	  		           fn vote -> 
-	  		             Map.get(vote, "chamber") == chamber
-	  		           	   and String.contains?(Map.get(vote, "result"), "Passed")
-	  		           end)
-	  	|> Map.take(["roll_call", "date"])
-  end
-
-  defp get_vote_data(chamber, session, roll_call) do
-  	Congress.get_propublica_request_body("#{chamber}/sessions/#{session}/votes/#{roll_call}.json", true)
-  end
-
-  def get_vote_tally(chamber, votes, reps) do
-  	roll_call_info = get_roll_call_info(chamber, votes)
-  	roll_call = Map.get(roll_call_info, "roll_call")
-
-  	if roll_call do
-	  	vote_data = get_vote_data(chamber, get_session(Map.get(roll_call_info, "date")), roll_call)
-						  	|> Congress.get_results
-						    |> elem(1)
-						    |> Map.get("vote")
-
-			rep_votes =
-				if Enum.count(reps) do
-					Map.get(vote_data, "positions")
-					|> Enum.filter(fn pos -> Enum.member?(reps, pos["name"]) end)
-				else
-					nil
-				end
-
-			%{"total": Map.get(vote_data, "total"),
-		    "rep_votes": rep_votes}
-	  end
-  end
-
   def get_all_vote_info(votes, senator1, senator2, house_rep) do
-  	%{"senate": get_vote_tally("Senate", votes, [senator1, senator2]),
-  	  "house": get_vote_tally("House", votes, [house_rep])}
+    %{"senate": get_vote_tally("Senate", votes, [senator1, senator2]),
+      "house": get_vote_tally("House", votes, [house_rep])}
+  end
+
+  defp get_vote_tally(chamber, votes, reps) do
+    roll_call_info = get_roll_call_info(chamber, votes)
+
+    if roll_call_info do
+      vote_data = get_vote_data(chamber, roll_call_info)
+      rep_votes = get_rep_votes(reps, vote_data)
+      %{"total": Map.get(vote_data, "total"), "rep_votes": rep_votes}
+    end
+  end
+
+  defp get_roll_call_info(chamber, votes) do
+    case Enum.find(votes, fn v -> is_passing_vote?(v, chamber) end) do
+      nil -> nil
+      vote -> Map.take(vote, ["roll_call", "date"])
+    end
+  end
+
+  defp get_vote_data(chamber, roll_call_info) do
+    Congress.congress_num
+    <> "/#{chamber}/sessions/"
+    <> (roll_call_info |> Map.get("date") |> get_session())
+    <> "/votes/"
+    <> (roll_call_info |> Map.get("roll_call"))
+    <> ".json"
+
+    |> Congress.get_propublica_request_body
+    |> Congress.get_results
+    |> elem(1)
+    |> Map.get("vote")
+  end
+
+  defp get_rep_votes(reps, vote_data) do
+    case Enum.count(reps) do
+      0 -> nil
+      _ -> for pos <- Map.get(vote_data, "positions"),
+             Enum.member?(reps, pos["name"]), do: pos
+    end
+  end
+
+  defp is_passing_vote?(vote, chamber) do
+    Map.get(vote, "result") |> String.contains?("Passed")
+      and Map.get(vote, "chamber") == chamber
+  end
+
+  defp get_session(date) do
+    date
+	  |> String.split("-")
+	  |> Enum.at(0)
+	  |> Integer.parse
+	  |> elem(0)
+	  |> rem(2)
+    |> case do 1 -> "1"; 0 -> "2" end
   end
 end

@@ -24,25 +24,21 @@ defmodule Congress.Bill do
     Repo.one(from b in Bill, select: count(b.id))
   end
 
-  def get_bill(id) do
-    Repo.get!(Bill, id)
-  end
-
-  def get_bill_slug_by_id(id) do
-    get_bill(id).bill_slug
-  end
-
   def pick_random_bill_except(old_slug) do
-    new_slug = get_bill_slug_by_id(:rand.uniform(get_bill_count())) # random id
+    new_slug = get_bill_count() |> :rand.uniform |> get_bill_slug_by_id
 
     if old_slug == new_slug do
       pick_random_bill_except(old_slug)
     else
-      Congress.get_propublica_request_body("bills/#{new_slug}.json", true)
+      Congress.get_propublica_request_body("#{Congress.congress_num}/bills/#{new_slug}.json")
     end
   end
 
   def get_new_bills do
-    Congress.get_propublica_request_body("house/bills/enacted.json", true)
+    Congress.get_propublica_request_body("#{Congress.congress_num}/house/bills/enacted.json")
+  end
+
+  defp get_bill_slug_by_id(id) do
+    Repo.get!(Bill, id).bill_slug
   end
 end

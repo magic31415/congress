@@ -5,7 +5,8 @@ defmodule Congress.Representative do
   	places = get_state_and_district(address, zip)
   	state = Map.get(places, :state)
   	district = Map.get(places, :district)
-  	reps = Enum.concat(get_senators(state), get_house_rep(state, district))
+  	reps = Enum.concat(parse_reps("members/senate/#{state}/current.json"),
+                       parse_reps("members/house/#{state}/#{district}/current.json"))
   	
   	%{"state": String.upcase(state),
   		"district": district,
@@ -14,35 +15,28 @@ defmodule Congress.Representative do
   	  "house-rep": Enum.at(reps, 2)}
   end
 
-  def get_state_and_district(address, zip) do
-  	address_param = address
-  	              |> String.split
-  	              |> Enum.concat([zip])
-  	              |> Enum.join("+")
-
-  	places = Congress.get_google_request_body(
-  		"representatives?address=#{address_param}&includeOffices=false&levels=country&")
-			  	 |> Poison.decode
-			  	 |> elem(1)
-			  	 |> Map.get("divisions")
-			  	 |> Map.keys
-			  	 |> Enum.at(-1)
-			  	 |> String.split(["/", ":"])
+  defp get_state_and_district(address, zip) do
+  	places =
+      Congress.get_google_request_body(
+        "representatives?address="
+        <> (String.split(address) |> Enum.concat([zip]) |> Enum.join("+"))
+        <> "&includeOffices=false&levels=country&")
+  	 
+      |> Poison.decode
+  	  |> elem(1)
+  	  |> Map.get("divisions")
+  	  |> Map.keys
+  	  |> Enum.at(-1)
+  	  |> String.split(["/", ":"])
 
 		%{"state": Enum.at(places, 4), "district": Enum.at(places, 6) || "1"}
   end
 
-  def get_senators(state) do
-  	Congress.get_propublica_request_body("members/senate/#{state}/current.json", false)
-  	|> Poison.decode
-  	|> elem(1)
-  	|> Map.get("results")
-  end
-
-  def get_house_rep(state, district) do
-  	Congress.get_propublica_request_body("members/house/#{state}/#{district}/current.json", false)
-  	|> Poison.decode
-  	|> elem(1)
-  	|> Map.get("results")
+  defp parse_reps(response) do
+    response
+    |> Congress.get_propublica_request_body()
+    |> Poison.decode
+    |> elem(1)
+    |> Map.get("results")
   end
 end
