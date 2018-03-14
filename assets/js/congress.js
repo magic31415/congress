@@ -109,7 +109,7 @@ export default class Congress extends React.Component {
 
 	render() {
 		const showExtra = this.state.showExtra;
-		const visibility = showExtra ? "" : "invisible"
+		const visibility = showExtra ? "" : "d-none"
 
 		return (
 			<div className="text-center">
