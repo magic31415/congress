@@ -100,10 +100,10 @@ export default class Representatives extends React.Component {
 	render() {
 		return (
 			<div className="row" id="representatives">
-				<ul className="col" id="houseReps">
+				<ul className="col rep-list" id="houseReps">
 					{this.createListOfReps(this.props.houseReps, this.state.parsedVotesHouse)}
 				</ul>
-				<ul className="col" id="senators">
+				<ul className="col rep-list" id="senators">
 					{this.createListOfReps(this.props.senators, this.state.parsedVotesSenate)}
 				</ul>
 				<div className="col">&nbsp;</div>

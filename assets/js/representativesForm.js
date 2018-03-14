@@ -56,6 +56,7 @@ export default class RepresentativesForm extends React.Component {
 		    				Zip Code:
 		    				<input type="text"
 		    				       name="zip"
+		    				       id="zip"
 		    				       className="ml-1"
 		    				       onChange={this.handleZipChange}
 		    				       value={this.state.zip}
