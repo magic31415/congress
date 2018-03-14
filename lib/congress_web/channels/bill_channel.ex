@@ -18,6 +18,14 @@ defmodule CongressWeb.BillChannel do
     true
   end
 
+  def handle_in("bill-count", _payload, socket) do
+    {:reply, {:ok, %{count: Bill.get_bill_count}}, socket}
+  end
+
+  def handle_in("reps", payload, socket) do
+    {:reply, {:ok, Representative.get_reps(payload["address"], payload["zip"])}, socket}
+  end
+
   def handle_in("bill", payload, socket) do
     # picks a random bill by slug
     results = payload["number"]
@@ -27,27 +35,21 @@ defmodule CongressWeb.BillChannel do
             |> Congress.get_results
             |> Map.take(["number", "title", "enacted",
                          "congressdotgov_url", "vetoed", "votes"])
-    
-    broadcast! socket, "bill", results
-    get_tallies socket, results["votes"], payload["reps"]
-    {:noreply, socket}
+
+    tallies = Vote.get_all_vote_info(results["votes"],
+                                     payload["senators"],
+                                     payload["houseReps"])
+
+    {:reply, {:ok, Map.put(results, "tallies", tallies)}, socket}
   end
 
-  def handle_in("bill-count", payload, socket) do
-    broadcast! socket, "bill-count", %{count: Bill.get_bill_count}
-    {:noreply, socket}
+  def handle_in("first-votes", payload, socket) do
+    {:reply, {:ok, Vote.get_all_vote_info(payload["votes"],
+                                          payload["senators"],
+                                          payload["houseReps"])}, socket}
   end
 
-  def handle_in("reps", payload, socket) do
-    broadcast! socket, "reps", Representative.get_reps(payload["address"], payload["zip"])
-    {:noreply, socket}
-  end
-
-  def get_tallies(socket, votes, reps) do
-    broadcast! socket, "tallies", %{"tallies": Vote.get_all_vote_info(votes,
-                                                                      reps["senator1"],
-                                                                      reps["senator2"],
-                                                                      reps["house_rep"])}
-    {:noreply, socket}
+  def handle_in("later-votes", payload, socket) do
+    {:reply, {:ok, payload}, socket}
   end
 end

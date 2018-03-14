@@ -7,12 +7,11 @@ defmodule Congress.Representative do
   	district = Map.get(places, :district)
   	reps = Enum.concat(parse_reps("members/senate/#{state}/current.json"),
                        parse_reps("members/house/#{state}/#{district}/current.json"))
-  	
+
   	%{"state": String.upcase(state),
   		"district": district,
-  		"senator1": Enum.at(reps, 0),
-  	  "senator2": Enum.at(reps, 1),
-  	  "house-rep": Enum.at(reps, 2)}
+      "senators": [Enum.at(reps, 0), Enum.at(reps, 1)],
+  	  "house-reps": [Enum.at(reps, 2)]}
   end
 
   defp get_state_and_district(address, zip) do
@@ -21,7 +20,7 @@ defmodule Congress.Representative do
         "representatives?address="
         <> (String.split(address) |> Enum.concat([zip]) |> Enum.join("+"))
         <> "&includeOffices=false&levels=country&")
-  	 
+
       |> Poison.decode
   	  |> elem(1)
   	  |> Map.get("divisions")

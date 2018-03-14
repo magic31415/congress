@@ -1,9 +1,9 @@
 defmodule Congress.Vote do
   alias Congress.Congress
 
-  def get_all_vote_info(votes, senator1, senator2, house_rep) do
-    %{"senate": get_vote_tally("Senate", votes, [senator1, senator2]),
-      "house": get_vote_tally("House", votes, [house_rep])}
+  def get_all_vote_info(votes, senators, house_reps) do
+    %{"senate": get_vote_tally("Senate", votes, senators),
+      "house": get_vote_tally("House", votes, house_reps)}
   end
 
   defp get_vote_tally(chamber, votes, reps) do
